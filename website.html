@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Radâr Ghuru - Aesthetic</title>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Quicksand:wght@400;600&display=swap');
+
+  body {
+    margin: 0;
+    padding: 25px;
+    font-family: "Quicksand", sans-serif;
+    background: linear-gradient(135deg, #143b52, #769ab3, #043544);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 500px;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 36px;
+    color: #0a1f2c;
+    margin-bottom: 5px;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: #0a2435;
+    margin-top: -5px;
+    font-size: 14px;
+  }
+
+  .card {
+    margin-top: 20px;
+    background: rgba(255, 255, 255, 0.55);
+    padding: 25px;
+    border-radius: 20px;
+    backdrop-filter: blur(12px);
+    border: 1.5px solid rgba(41, 39, 44, 0.3);
+  }
+
+  label {
+    font-weight: 600;
+    margin-top: 12px;
+    color: #050b11;
+    display: block;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 12px;
+    margin-top: 6px;
+    border-radius: 12px;
+    border: 1.5px solid #121213;
+    background: rgba(255, 255, 255, 0.8);
+    outline: none;
+  }
+
+  button {
+    margin-top: 18px;
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, #4ebce7, #201f20);
+    border: none;
+    border-radius: 14px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .list-item {
+    margin-top: 15px;
+    padding: 15px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.7);
+    border-left: 4px solid #141314;
+  }
+
+  .hapus-btn {
+    background: #310613;
+    margin-top: 10px;
+    border-radius: 12px;
+    width: 40%;
+    padding: 8px;
+    font-size: 13px;
+    border: none;
+    color: white;
+  }
+
+  /* NOTIFIKASI AESTHETIC */
+  .notif-box {
+    position: fixed;
+    right: 20px;
+    top: 20px;
+    background: #9ebfe6;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    font-weight: 600;
+    animation: slideIn .4s ease-out;
+    transition: .6s;
+    z-index: 9999;
+  }
+
+  @keyframes slideIn {
+    from { transform: translateX(80px); opacity: 0; }
+    to   { transform: translateX(0);   opacity: 1; }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>Radâr Ghuru</h1>
+  <p class="subtitle">Ngaterro lokasè ghuru ben wektu se ajhâl</p>
+
+  <div class="card">
+    <h3 style="color:#141616;">Input Lokasi Guru</h3>
+
+    <label>Nama Guru:</label>
+    <input id="guruInput" placeholder="Contoh: Pak Amir">
+
+    <label>Jenis Kelamin:</label>
+    <select id="genderSelect">
+      <option value="Laki-laki">Laki-laki</option>
+      <option value="Perempuan">Perempuan</option>
+    </select>
+
+    <label>Lokasi:</label>
+    <select id="lokasiSelect">
+      <option value="Ruang Guru">Ruang Guru</option>
+      <option value="Kelas">Kelas</option>
+      <option value="Rapat">Rapat</option>
+      <option value="Tidak Hadir">Tidak Hadir</option>
+    </select>
+
+    <label>Tanggal:</label>
+    <input type="date" id="tanggalInput">
+
+    <label>Jam Mulai:</label>
+    <input type="time" id="jamMulaiInput">
+
+    <label>Sampai Jam Berapa:</label>
+    <input type="time" id="jamSelesaiInput">
+
+    <button onclick="updateLocation()">Simpan Lokasi</button>
+  </div>
+
+  <div class="card">
+    <h3 style="color:#101113;">Radar Guru Real-time</h3>
+    <div id="displayArea">
+      <p>Belum ada data...</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const dataGuru = {};
+
+  function showNotif(msg) {
+    const n = document.createElement("div");
+    n.className = "notif-box";
+    n.innerHTML = msg;
+    document.body.appendChild(n);
+
+    setTimeout(() => { n.style.opacity = "0"; }, 1800);
+    setTimeout(() => { n.remove(); }, 2600);
+  }
+
+  function getEmoji(g) {
+    return g === "Laki-laki" ? "👨‍🏫" : "👩‍🏫";
+  }
+
+  function updateLocation() {
+    const nama = document.getElementById("guruInput").value.trim();
+    const gender = document.getElementById("genderSelect").value;
+    const lokasi = document.getElementById("lokasiSelect").value;
+    const tanggal = document.getElementById("tanggalInput").value;
+    const mulai = document.getElementById("jamMulaiInput").value;
+    const selesai = document.getElementById("jamSelesaiInput").value;
+
+    if (!nama) return showNotif("⚠ Nama guru harus diisi!");
+
+    dataGuru[nama] = { gender, lokasi, tanggal, mulai, selesai };
+    renderDisplay();
+
+    showNotif("✔ Data guru berhasil disimpan!");
+  }
+
+  function hapusData(nama) {
+    delete dataGuru[nama];
+    renderDisplay();
+    showNotif("🗑 Data berhasil dihapus");
+  }
+
+  function renderDisplay() {
+    const area = document.getElementById("displayArea");
+    area.innerHTML = "";
+
+    const keys = Object.keys(dataGuru);
+    if (keys.length === 0) {
+      area.innerHTML = "<p>Belum ada data...</p>";
+      return;
+    }
+
+    keys.forEach(nama => {
+      const d = dataGuru[nama];
+      const div = document.createElement("div");
+      div.className = "list-item";
+
+      div.innerHTML = `
+        <strong>${getEmoji(d.gender)} ${nama}</strong><br>
+        Lokasi: <b>${d.lokasi}</b><br>
+        Tanggal: ${d.tanggal}<br>
+        Jam: ${d.mulai} - ${d.selesai}<br>
+        <button class="hapus-btn" onclick="hapusData('${nama}')">Hapus</button>
+      `;
+
+      area.appendChild(div);
+    });
+  }
+</script>
+
+</body>
+</html>
